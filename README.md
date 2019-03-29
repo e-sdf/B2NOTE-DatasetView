@@ -4,13 +4,25 @@ This project contains code for UI in order to view,
 browse files and folders in connected virtual folder 
 and select dataset and files and annotate them using connected B2Note API.
 
-# `b-2-note-datasetview`
 
+### Recomemnded usage
 This project is bootstrapped by [aurelia-cli](https://github.com/aurelia/cli).
-
 For more information, go to https://aurelia.io/docs/cli/webpack
 
-## Run dev app
+Recommended usage:
+
+```
+git clone https://bitbucket.org/tkulhanek/b2note-datasetview.git
+cd b2note-datasetview
+npm install
+au build
+```
+In order to enable continuous build on changes during development launch:
+`au build --watch`
+
+This will produce output to `dist/` directory. Which can be mapped from apache configuration
+
+### Run dev app
 
 Run `au run`, then open `http://localhost:8080`
 
@@ -22,11 +34,11 @@ To enable Webpack Bundle Analyzer, do `au run --analyze`.
 
 To enable hot module reload, do `au run --hmr`.
 
-## Build for production
+### Build for production
 
 Run `au build --env prod`.
 
-## Unit tests
+### Unit tests
 
 Run `au test` (or `au jest`).
 
