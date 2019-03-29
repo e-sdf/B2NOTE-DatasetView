@@ -43,7 +43,7 @@ module.exports = ({ production, server, extractCss, coverage, analyze, karma } =
     sourceMapFilename: production ? '[name].bundle.map' : '[name].bundle.map',
     chunkFilename: production ? '[name].[chunkhash].chunk.js' : '[name].[hash].chunk.js'
   },
-  optimization: {
+  /*optimization: {
     runtimeChunk: true,  // separates the runtime chunk, required for long term cacheability
     // moduleIds is the replacement for HashedModuleIdsPlugin and NamedModulesPlugin deprecated in https://github.com/webpack/webpack/releases/tag/v4.16.0
     // changes module id's to use hashes be based on the relative path of the module, required for long term cacheability
@@ -54,7 +54,7 @@ module.exports = ({ production, server, extractCss, coverage, analyze, karma } =
       hidePathInfo: true, // prevents the path from being used in the filename when using maxSize
       chunks: "initial",
       // sizes are compared against source before minification
-      maxSize: 200000, // splits chunks if bigger than 200k, adjust as required (maxSize added in webpack v4.15)
+      maxSize: 2000000, // splits chunks if bigger than 200k, adjust as required (maxSize added in webpack v4.15)
       cacheGroups: {
         default: false, // Disable the built-in groups default & vendors (vendors is redefined below)
         // You can insert additional cacheGroup entries here if you want to split out specific modules
@@ -99,7 +99,7 @@ module.exports = ({ production, server, extractCss, coverage, analyze, karma } =
         }
       }
     }
-  },
+  },*/
   performance: { hints: false },
   devServer: {
     contentBase: outDir,
