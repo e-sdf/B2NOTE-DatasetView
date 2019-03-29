@@ -1,34 +1,27 @@
-import {computedFrom} from 'aurelia-framework';
 
+import {inject} from 'aurelia-framework';
+import {HttpClient} from 'aurelia-fetch-client';
+
+@inject(HttpClient)
 export class Welcome {
-  heading = 'Welcome to the Aurelia Navigation App!';
-  firstName = 'John';
-  lastName = 'Doe';
-  previousValue = this.fullName;
-
-  //Getters can't be directly observed, so they must be dirty checked.
-  //However, if you tell Aurelia the dependencies, it no longer needs to dirty check the property.
-  @computedFrom('firstName', 'lastName')
-  get fullName() {
-    return `${this.firstName} ${this.lastName}`;
+  heading = 'B2Note Dataset View';
+  constructor(http) {
+    http.configure(config => {
+      config
+        .useStandardConfiguration()
+        .withBaseUrl('/api/');
+    });
+    this.annotations = {};
+    this.annotations._meta= {};
+    this.annotations._meta.total="N/A";
+    this.http = http;
   }
 
-  submit() {
-    this.previousValue = this.fullName;
-    // eslint-disable-next-line no-alert
-    alert(`Welcome, ${this.fullName}!`);
+  activate() {
+    return this.http.fetch('annotations')
+      .then(response => response.json())
+      .then(annotations => this.annotations = annotations);
   }
 
-  canDeactivate() {
-    if (this.fullName !== this.previousValue) {
-      // eslint-disable-next-line no-alert
-      return confirm('Are you sure you want to leave?');
-    }
-  }
 }
 
-export class UpperValueConverter {
-  toView(value) {
-    return value && value.toUpperCase();
-  }
-}
