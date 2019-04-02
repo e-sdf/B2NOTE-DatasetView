@@ -20,7 +20,12 @@ export class Welcome {
   activate() {
     return this.http.fetch('annotations')
       .then(response => response.json())
-      .then(annotations => this.annotations = annotations);
+      .then(annotations => this.annotations = annotations)
+      .catch(error => {
+        //this.files = [];
+        console.log('welcome - fetch annotations error');
+        console.log(error);
+      });
   }
 }
 
