@@ -31,17 +31,20 @@ export class Filelist {
     //hold depth of directory structure if cd into them
   }
 
-  atached() {
+  attached() {
     let providers = this.pa.getProviders();
     this.dirs = [];
     this.files = [];
-    for (let provider of providers){
+    for (let provider of providers) {
       let item = {};
-      item.name = provider.name;
+      item.name = provider.alias;
+      item.nicesize = 'DIR (' + provider.type + ')';
       item.nicedate = '';
       item.isdir = true;
       this.files.push(item);
     }
+    console.log('filelist:');
+    console.log(this.files);
   }
 
   setwebdav(webdavurl) {

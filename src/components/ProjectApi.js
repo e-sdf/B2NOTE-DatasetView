@@ -46,7 +46,7 @@ export class ProjectApi {
   }
 
   getProviders() {
-    return ProjectApi.getValue('providers', [{alias: 'test', type: 'dropbox'}, {alias: 'test2', type: 'webdav'}]);
+    return ProjectApi.getValue('providers', [{alias: 'test-dropbox', type: 'dropbox'}, {alias: 'test-b2drop', type: 'webdav'}]);
   }
 
   setProviders(pr) {
