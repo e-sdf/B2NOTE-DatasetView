@@ -6,10 +6,10 @@
         <td click.trigger="selectFile(file)"><ifile if.bind="! file.isdir"></ifile><ifolder if.bind="file.isdir"></ifolder></td>
         <td click.trigger="selectFile(file)" if.bind="! file.isdir" title="click to preview file in right panel">
           <span style="display:block;overflow:hidden;">
-          ${file.name}
+          ${file.nicename}
           </span>
         </td>
-        <td click.trigger="selectFile(file)" if.bind="file.isdir" title="click to go to directory"><b>${file.name}</b></td>
+        <td click.trigger="selectFile(file)" if.bind="file.isdir" title="click to go to directory"><b>${file.nicename}</b></td>
         <td click.trigger="selectFile(file)">${file.nicesize}</td>
         <td click.trigger="selectFile(file)">${file.nicedate}</td>
         <td><ilink if.bind="! file.isdir" href.bind="file.webdavurl"></ilink></td>

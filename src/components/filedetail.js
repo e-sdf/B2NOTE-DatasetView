@@ -43,7 +43,7 @@ export class Filedetail {
 
   selectFile(file) {
     let that = this;
-
+    console.log('selecting file',file)
     this.imageurl = file.webdavurl;
     //visualizeimg is set & image extension is detected
     //vfstorage returns string - should convert to boolean
@@ -61,11 +61,13 @@ export class Filedetail {
 
     //console.log("fileeditor.selectfile() visualizeimg: isimage:")
     //console.log(this.isimage);
-
+    let headers = file.auth ? {'Range': 'bytes=0-4095', 'Authorization': 'Basic ' + file.auth} : {'Range': 'bytes=0-4095'};
     /*get first 4 kB of data, if it is supported by web server in Range header */
     if (!this.isimage) {
-      this.client.fetch(file.webdavurl, {credentials: 'same-origin', headers: {'Range': 'bytes=0-4095'}})
-        .then(response => {
+      this.client.fetch(file.webdavurl, {credentials: 'same-origin', headers: headers})
+        .then(response => response.text())
+        .then(data =>{
+          console.log(data);
           that.codemirror.setValue(data);
           that.codemirror.refresh();
           that.filename = file.webdavurl;
@@ -82,5 +84,4 @@ export class Filedetail {
     this.codemirror.setValue(JSON.stringify(content, null, 4));
     this.codemirror.refresh();
   }
-
 }

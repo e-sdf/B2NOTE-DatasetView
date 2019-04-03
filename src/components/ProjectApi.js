@@ -46,10 +46,25 @@ export class ProjectApi {
   }
 
   getProviders() {
-    return ProjectApi.getValue('providers', [{alias: 'test-dropbox', type: 'dropbox'}, {alias: 'test-b2drop', type: 'webdav'}]);
+    return JSON.parse(ProjectApi.getValue('providers', '[]'));
   }
 
   setProviders(pr) {
-    return ProjectApi.setValue('providers', pr);
+    return ProjectApi.setValue('providers', JSON.stringify(pr));
+  }
+
+  getB2noteurl() {
+    return ProjectApi.getValue('b2noteurl', '/api');
+  }
+
+  setB2noteurl(url) {
+    return ProjectApi.setValue('b2noteurl', url);
+  }
+
+
+  addProvider(pr) {
+  }
+  removeProvider(pr) {
+
   }
 }

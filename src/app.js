@@ -23,7 +23,14 @@ export class App {
         name: 'fileview',
         moduleId: PLATFORM.moduleName('./pages/fileview'),
         nav: true,
-        title: 'File Manager'
+        title: 'Dataset View'
+      },
+      {
+        route: 'annotationview',
+        name: 'annotationview',
+        moduleId: PLATFORM.moduleName('./pages/annotationview'),
+        nav: true,
+        title: 'Annotation View'
       }
     ]);
 

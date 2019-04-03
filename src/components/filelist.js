@@ -28,75 +28,104 @@ export class Filelist {
         });
     });
     this.webdavpath = '';///files/XufWqKau/';
+    this.auth = false;
     //hold depth of directory structure if cd into them
   }
 
   attached() {
+    this.root();
+  }
+
+  root() {
     let providers = this.pa.getProviders();
     this.dirs = [];
     this.files = [];
     for (let provider of providers) {
       let item = {};
       item.name = provider.alias;
+      item.nicename = provider.alias;
       item.nicesize = 'DIR (' + provider.type + ')';
       item.nicedate = '';
       item.isdir = true;
+      item.isprovider = true;
+      /*let prefix = provider.endpoint.slice(0, 8);
+      let username = provider.username.replace('@', '%40');
+      let suffix = provider.endpoint.slice(8);
+      item.url = prefix + username + ':' + provider.usersecure + '@' + suffix;*/
+      item.url = provider.endpoint;
+      item.auth = btoa(provider.username + ':' + provider.usersecure);
       this.files.push(item);
     }
-    console.log('filelist:');
-    console.log(this.files);
   }
 
-  setwebdav(webdavurl) {
+  setwebdav(webdavurl, auth) {
     console.log('setwebdav() obtained url:' + webdavurl);
     this.webdavpath = webdavurl;
     if (!webdavurl) {this.files = []; return;}
     //query the directory content
+    let headers = auth ? {'Depth': '1', 'Authorization': 'Basic ' + auth} : {'Depth': '1'};
     this.httpclient.fetch(this.webdavpath, {
       method: 'PROPFIND',
-      headers: {'Depth': '1'}
+      headers: headers
     }).then(response => response.text())
       .then(str => (new window.DOMParser()).parseFromString(str, 'text/xml'))
       .then(data => {
         //parse structure https://stackoverflow.com/questions/17604071/parse-xml-using-javascript
         this.files = [];
-        let filesDOM = data.getElementsByTagName('D:response');
+        let tempfiles = [];
+        let tempdirs = [];
+        let filesDOM = data.getElementsByTagNameNS('DAV:', 'response');
+        console.log(data);
         for (let fileitem of filesDOM) {
-          let filename = this.getFirstElementByTagName(fileitem, 'D:href');
-          let filedate = this.getFirstElementByTagName(fileitem, 'lp1:creationdate');
-          let filesize = this.getFirstElementByTagName(fileitem, 'lp1:getcontentlength');
-          let filetype = this.getFirstElementByTagName(fileitem, 'D:getcontenttype');
-          //console.log(this.webdavpath+" x "+filename);
-          if (filename !== this.webdavpath) { //do not include current dir
-            let item = {};
-            item.name = filename.replace(this.webdavpath, '');
-            item.date = filedate;
-            item.nicedate = this.formatdate(new Date(filedate));
-            item.isdir = filetype === 'httpd/unix-directory';
-            item.size = filetype === 'httpd/unix-directory' ? 'DIR' : filesize;
-            //convert to 4GB or 30MB or 20kB or 100b
-            if (item.isdir) {
-              item.nicesize = item.size;
+          console.log(fileitem);
+          let fileurl = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'href');
+          let filename = this.lastContextName(fileurl);
+          let filedate = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'getlastmodified');
+          let filesize = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'getcontentlength');
+          let filetype = this.getContentType(fileitem);//FirstElementByTagNameNS(fileitem, 'DAV:', 'getcontenttype');
+          //let contenttype = this.getContentType(fileitem);//FirstElementByTagNameNS(fileitem, 'DAV:', 'resourcetype');
+          console.log(this.webdavpath + ' x ' + filename);
+
+          let item = {};
+          item.name = filename;//.replace(this.webdavpath, ''); //replaces the prefix
+          item.nicename = filename.startsWith('/') ? filename.slice(1) : filename;
+          item.date = filedate;
+          item.nicedate = filedate;  //this.formatdate(new Date(filedate));
+          item.isdir = filetype === 'httpd/unix-directory' || filetype === 'collection';
+          item.size = filetype === 'httpd/unix-directory' || filetype === 'collection' ? 'DIR' : filesize;
+          //convert to 4GB or 30MB or 20kB or 100b
+          if (item.isdir) {
+            item.nicesize = item.size;
+          } else {
+            if (~~(item.size / 1000000000) > 0) {
+              item.nicesize = ~~(item.size / 1000000000) + 'GB';
             } else {
-              if (~~(item.size / 1000000000) > 0) {
-                item.nicesize = ~~(item.size / 1000000000) + 'GB';
+              if (~~(item.size / 1000000) > 0) {
+                item.nicesize = ~~(item.size / 1000000) + 'MB';
               } else {
-                if (~~(item.size / 1000000) > 0) {
-                  item.nicesize = ~~(item.size / 1000000) + 'MB';
-                } else {
-                  item.nicesize = ~~(item.size / 1000) > 0 ? ~~(item.size / 1000) + 'kB' : item.size + ' b';
-                }
+                item.nicesize = ~~(item.size / 1000) > 0 ? ~~(item.size / 1000) + 'kB' : item.size + ' b';
               }
             }
+
             item.type = filetype;
             item.webdavurl = this.webdavpath + item.name;
             //directory first, files after that
-            if (item.isdir) this.files.unshift(item);
-            else this.files.push(item);
           }
+          //console.log('adding item');
+          //console.log(item);
+          //if (fileurl === this.webdavpath) item.name = '..'; //first item might be the current dir
+          if (item.isdir) tempdirs.push(item);//this.files.unshift(item);
+          else tempfiles.push(item);//this.files.push(item);
         }
         //adds first row with '..' to cd to parent directory
-        if (this.dirs.length > 0) this.files.unshift({name: '..', isdir: true, size: 'DIR', date: ''});
+        //if (this.dirs.length > 0)
+        //ignore first dir - as it is self
+        tempdirs.shift();//this.files.shift(); //first is self
+        //concat dirs first, files last
+        //console.log('dirs and files:',tempdirs,tempfiles);
+        this.files = tempdirs.concat(tempfiles);
+        //add first .. to be able to cd up
+        this.files.unshift({name: '..', nicename: '..', isdir: true, nicesize: 'DIR', date: ''});
       }).catch(error => {
         this.files = [];
         console.log('setwebdav() error');
@@ -111,18 +140,43 @@ export class Filelist {
     return elements.length > 0 ? elements[0].textContent : '';
   }
 
+  getFirstElementByTagNameNS(fileitem, ns, tag) {
+    //console.log(tag);
+    let elements = fileitem.getElementsByTagNameNS(ns, tag);
+    //console.log(elements);
+    return elements.length > 0 ? elements[0].textContent : '';
+  }
+
+  getContentType(fileitem) {
+    //[0].firstChild.localName
+    let rt = fileitem.getElementsByTagNameNS('DAV:', 'resourcetype');
+    if (rt.length > 0 && rt[0].firstChild ) return rt[0].firstChild.localName;
+    return this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'getcontenttype');
+  }
+
+  lastContextName(str) {
+    let str2 = str.endsWith('/') ? str.slice(0, str.lastIndexOf('/')) : str;
+    let sli = str2.lastIndexOf('/');
+    return sli >= 0 ? str.slice(sli) : str; //keep last slash
+  }
+
   selectFile(file) {
     //file.webdavurl = this.webdavpath+file.name;
+    if (file.isprovider) {
+      this.auth = file.auth;
+      this.setwebdav(file.url, file.auth);
+    } else
     if (file.isdir) {
       let newdir = '';
       if (file.name === '..') {
-        newdir = this.dirs.pop();
+        if (this.dirs.length === 0) { this.root(); return; } //going from current storage
+        newdir = this.dirs.pop(); //going up inside storage
       } else {
         this.dirs.push(this.webdavpath);
         newdir = this.webdavpath + file.name;
       }
-      this.setwebdav(newdir);
-    } else  this.ea.publish(new Editfile(file));
+      this.setwebdav(newdir, this.auth);
+    } else { file.auth = this.auth; this.ea.publish(new Editfile(file)); }
   }
 
   formatdate(date) {

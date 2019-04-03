@@ -2,8 +2,8 @@
   <section class="au-animate">
     <h2>Settings</h2>
     This web widget is unhosted, connect to appropriate services first
-    <h3>connect B2NOTE instance API</h3>
-    <input placeholder="https://b2note.bsc.es/" title="put B2NOTE API endpoint"/>
+    <h3>connect B2NOTE instance API (e.g. https://b2note.bsc.es/api):</h3>
+    <input placeholder="/api" title="type B2NOTE API endpoint" value.bind="b2noteurl"/><button class="w3-button" click.delegate="submit()">Save</button>
     <h3>connect dataset storages</h3>
     West-Life Virtual Folder, Dropbox, EUDAT B2DROP, or any WEBDAV capable data storage are supported.
 
@@ -13,6 +13,7 @@
       <tr>
         <th align="left">Alias</th>
         <th align="left">Type</th>
+        <th></th>
         <th></th>
       </tr>
       </thead>
@@ -25,7 +26,34 @@
           <i show.bind="!provider.temporary" class="fa fa-remove" click.delegate="removeProvider(provider)"></i>
         </td>
       </tr>
+      <tr if.bind="! adding">
+        <td colspan="2"><button class="w3-button" click.delegate="addingProvider()">Add new</button></td>
+      </tr>
+      <tr if.bind="adding">
+        <td>
+          <input type="text" value.bind="addname"/>
+        </td>
+        <td>
+          <select value.bind="addtype">
+            <option value="" disabled selected>Choose provider</option>
+            <option repeat.for="provider of supportedproviders" value.bind="provider">${provider}</option>
+          </select>
+        </td>
+        <td>Endpoint:
+          <input type="text" value.bind="addendpoint"/>
+        </td>
+        <td>Username:
+          <input type="text" value.bind="addusername"/>
+        </td>
+        <td>Secure token (password):
+          <input type="password" value.bind="addusersecure"/>
+        </td>
+        <td>
+          <button class="w3-button" click.delegate="addProvider()">Add new</button>
+        </td>
+      </tr>
       </tbody>
     </table>
+
   </section>
 </template>
