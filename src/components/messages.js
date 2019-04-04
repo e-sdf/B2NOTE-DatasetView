@@ -20,3 +20,8 @@ export class Viewcontent {
   }
 }
 
+export class Viewanno {
+  constructor(anno) {
+    this.anno = anno;
+  }
+}

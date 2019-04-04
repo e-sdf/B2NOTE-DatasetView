@@ -1,3 +1,11 @@
 <template>
-  
+  Items related to annotations
+  <table  class="w3-table-all">
+    <tr  class="w3-hover-green" repeat.for="item of items">
+      <td>${item.name}</td>
+      <td>${item.size}</td>
+      <td>${item.date}</td>
+      <td>${item.preview}</td>
+    </tr>
+  </table>
 </template>
