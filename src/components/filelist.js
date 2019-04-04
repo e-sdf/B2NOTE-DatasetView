@@ -80,7 +80,7 @@ export class Filelist {
           console.log(fileitem);
           let fileurl = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'href');
           let filename = this.lastContextName(fileurl);
-          let filedate = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'getlastmodified');
+          let filedate = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'creationdate');
           let filesize = this.getFirstElementByTagNameNS(fileitem, 'DAV:', 'getcontentlength');
           let filetype = this.getContentType(fileitem);//FirstElementByTagNameNS(fileitem, 'DAV:', 'getcontenttype');
           //let contenttype = this.getContentType(fileitem);//FirstElementByTagNameNS(fileitem, 'DAV:', 'resourcetype');
@@ -88,9 +88,9 @@ export class Filelist {
 
           let item = {};
           item.name = filename;//.replace(this.webdavpath, ''); //replaces the prefix
-          item.nicename = filename.startsWith('/') ? filename.slice(1) : filename;
+          item.nicename = this.formatName(filename);//
           item.date = filedate;
-          item.nicedate = filedate;  //this.formatdate(new Date(filedate));
+          item.nicedate = this.formatDate(new Date(filedate));
           item.isdir = filetype === 'httpd/unix-directory' || filetype === 'collection';
           item.size = filetype === 'httpd/unix-directory' || filetype === 'collection' ? 'DIR' : filesize;
           //convert to 4GB or 30MB or 20kB or 100b
@@ -160,6 +160,12 @@ export class Filelist {
     return sli >= 0 ? str.slice(sli) : str; //keep last slash
   }
 
+  formatName(fn) {
+    let filename = fn.replace(/%20/g, ' ');
+
+    return filename.startsWith('/') ? filename.slice(1) : filename;
+  }
+
   selectFile(file) {
     //file.webdavurl = this.webdavpath+file.name;
     if (file.isprovider) {
@@ -179,7 +185,7 @@ export class Filelist {
     } else { file.auth = this.auth; this.ea.publish(new Editfile(file)); }
   }
 
-  formatdate(date) {
+  formatDate(date) {
     let diff = new Date() - date; // the difference in milliseconds
 
     if (diff < 1000) { // less than 1 second

@@ -1,6 +1,6 @@
 <template>
   <div class="w3-card">
-    <table class="w3-table-all">
+    <table>
       <tr show.bind="files.length==0"><td>This dataset is empty, no files to show for this dataset. Connect or upload data using WEBDAV capable url from the icon above <icopyicon></icopyicon>.</td></tr>
       <tr class="w3-hover-green" repeat.for="file of files">
         <td click.trigger="selectFile(file)"><ifile if.bind="! file.isdir"></ifile><ifolder if.bind="file.isdir"></ifolder></td>
@@ -9,7 +9,7 @@
           ${file.nicename}
           </span>
         </td>
-        <td click.trigger="selectFile(file)" if.bind="file.isdir" title="click to go to directory"><b>${file.nicename}</b></td>
+        <td class="w3-twothird" click.trigger="selectFile(file)" if.bind="file.isdir" title="click to go to directory"><b>${file.nicename}</b></td>
         <td click.trigger="selectFile(file)">${file.nicesize}</td>
         <td click.trigger="selectFile(file)">${file.nicedate}</td>
         <td><ilink if.bind="! file.isdir" href.bind="file.webdavurl"></ilink></td>
