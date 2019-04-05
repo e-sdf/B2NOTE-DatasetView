@@ -1,10 +1,10 @@
 <template>
   Browse among existing annotation, click to see linked dataset items
-  <table >
+  <table clas="w3-table-all">
     <tr  class="w3-hover-green" repeat.for="an of annotations">
       <td click.trigger="selectAnno(an)">${an.id}</td>
-      <td click.trigger="selectAnno(an)">${an.name}</td>
-      <td click.trigger="selectAnno(an)">${an.type}</td>
+      <td click.trigger="selectAnno(an)">${an.body.type}</td>
+      <td click.trigger="selectAnno(an)">${an.body.value}</td>
     </tr>
   </table>
 </template>

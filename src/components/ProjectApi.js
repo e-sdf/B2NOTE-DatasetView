@@ -1,11 +1,10 @@
 import {HttpClient} from 'aurelia-fetch-client';
+import {inject} from 'aurelia-framework';
 /* Provides methods to return promise of data from REST Project api*/
 //declare - not define
 //var virtualfolderbaseurl;
-
+@inject(HttpClient)
 export class ProjectApi {
-  static inject = [HttpClient];
-
 
   constructor(httpclient) {
     this.httpclient = httpclient;
@@ -65,6 +64,16 @@ export class ProjectApi {
   addProvider(pr) {
   }
   removeProvider(pr) {
+  }
 
+  getB2NoteAnnotations() {
+    let b2noteurl = this.getB2noteurl();
+    return this.httpclient.fetch(b2noteurl + '/annotations')
+      .then(response => response.json())
+      .then(annotations => {return annotations;})
+      .catch(error =>{
+        console.log("fetch on '" + b2noteurl + "' returned error:", error);
+        throw error;
+      });
   }
 }

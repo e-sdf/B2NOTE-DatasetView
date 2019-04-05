@@ -1,25 +1,18 @@
 
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-fetch-client';
-
-@inject(HttpClient)
+import {ProjectApi} from '../components/ProjectApi';
+@inject(ProjectApi)
 export class Welcome {
   heading = 'B2Note Dataset View';
-  constructor(http) {
-    http.configure(config => {
-      config
-        .useStandardConfiguration()
-        .withBaseUrl('/api/');
-    });
+  constructor(pa) {
     this.annotations = {};
     this.annotations._meta = {};
     this.annotations._meta.total = 'N/A';
-    this.http = http;
+    this.pa = pa;
   }
 
   activate() {
-    return this.http.fetch('annotations')
-      .then(response => response.json())
+    this.pa.getB2NoteAnnotations()
       .then(annotations => this.annotations = annotations)
       .catch(error => {
         //this.files = [];

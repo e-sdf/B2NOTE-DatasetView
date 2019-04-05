@@ -4,6 +4,16 @@ This project contains code for UI in order to view,
 browse files and folders in connected virtual folder 
 and select dataset and files and annotate them using connected B2Note API.
 
+To continuously compile on source code changes:
+
+`au build --watch`
+
+To publish the build result into public github pages, 
+* Enable github pages, 
+* set gh-pages branch to be used. 
+* launch following on after desired change was build: `./publishsite.sh`
+
+
 
 ### Recomemnded usage
 This project is bootstrapped by [aurelia-cli](https://github.com/aurelia/cli).
