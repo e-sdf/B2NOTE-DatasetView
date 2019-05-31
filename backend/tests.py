@@ -89,31 +89,74 @@ class B2noteRestApiTestCase(unittest.TestCase):
       response2 = self.get(responsedata['_id'])
       responsedata2 = json.loads(response2.content)
       #print(responsedata2)
-      self.assertEquals(responsedata['_id'],responsedata2['_id'])
+      self.assertEqual(responsedata['_id'],responsedata2['_id'])
 
     def test_stringbody_schema(self):
       body = '{"id":"http://example.org/anno1","body":"http://example.com/post1","target":"http://example.com/page1"}'
       response = self.post(body)
       #print(response.content)
-      assert b'"_status": "OK"' in response.content
+      self.assertIn(b'"_status": "OK"',response.content)
 
     def test_listbody_schema(self):
-
       body = '{"id":"http://example.org/anno1","body":["http://example.com/post1","http://example.com/post2"],"target":"http://example.com/page1"}'
       response = self.post(body)
       #print(response.content)
-      assert b'"_status": "OK"' in response.content
+      self.assertIn(b'"_status": "OK"',response.content)
 
     def test_listbodyids_schema(self):
       body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1"},{"id":"http://example.com/post2"}],"target":"http://example.com/page1"}'
       response = self.post(body)
-      print(response.content)
-      assert b'"_status": "OK"' in response.content
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
 
-    def test_listbodyformats_schema(self):
+    def test_listbodyformat_language_processinglanguage_textdirection_schema(self):
       body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":"audio/mpeg"},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
       response = self.post(body)
-      assert b'"_status": "OK"' in response.content
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":["audio/mpeg","audio/mp3"]},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":"audio/mpeg","language":"en"},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":"audio/mpeg","language":"en","processingLanguage":"en-UK"},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":"audio/mpeg","language":"en","processingLanguage":"en-UK","textDirection":"auto"},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":[{"id":"http://example.com/post1","format":"audio/mpeg","language":"en","processingLanguage":"en-UK","textDirection":"badvalue"},{"id":"http://example.com/post2","format":"application/pdf"}],"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertNotIn(b'"_status": "OK"',response.content)
+
+    def test_structbody(self):
+      body = '{"id":"http://example.org/anno1","body":{"id":"http://example.com/post1","type":"Text"},"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":{"id":"http://example.com/post1","type":"BadValue"},"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'unallowed value BadValue',response.content)
+      body = '{"id":"http://example.org/anno1","body":{"id":"http://example.com/post1","type":"TextualBody","value":"TestValue"},"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":{"id":"http://example.com/post1","type":"Choice","items":["TestValue","TestValue2"]},"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'"_status": "OK"',response.content)
+      body = '{"id":"http://example.org/anno1","body":{"id":"http://example.com/post1","type":"Choice","items":"BadTestValueShouldBeList"},"target":"http://example.com/page1"}'
+      response = self.post(body)
+      #print(response.content)
+      self.assertIn(b'must be of list type',response.content)
+      #self.assertIn(b'"_status": "OK"' in response.content
 
 
 
