@@ -53,3 +53,9 @@ Run `au build --env prod`.
 Run `au test` (or `au jest`).
 
 To run in watch mode, `au test --watch` or `au jest --watch`.
+
+---
+
+This work is co-funded by the EOSC-hub project (Horizon 2020) under Grant number 777536.
+
+![logo](https://b2note.bsc.es/img/logo-eosc-hub-eu.png)
